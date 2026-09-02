@@ -84,3 +84,111 @@ AWS Budgets can notify the account owner about spending, but it does not automat
 
 Completed
 
+
+
+---
+
+## Control 2: IAM Security Assessment and MFA Remediation
+
+### Objective
+
+Assess the AWS account’s IAM configuration, identify authentication weaknesses and strengthen console access by enabling multi-factor authentication.
+
+### AWS Service
+
+AWS Identity and Access Management (IAM)
+
+### Initial IAM Resources
+
+| Resource                  | Quantity |
+| ------------------------- | -------: |
+| IAM users                 |        2 |
+| User groups               |        1 |
+| Roles                     |        3 |
+| Customer-managed policies |        1 |
+| Identity providers        |        0 |
+
+### Initial Security Findings
+
+The IAM Dashboard displayed two security recommendations:
+
+1. MFA was not enabled for the AWS root user.
+2. MFA was not enabled for the current IAM user.
+
+The credential report also showed:
+
+| Security check    | Result |
+| ----------------- | ------ |
+| Active access key | False  |
+| MFA enabled       | False  |
+
+The absence of an active access key reduces the risk of programmatic credentials being leaked. However, the absence of MFA means the IAM user’s console access depends only on a password.
+
+### Risk
+
+If the IAM password is exposed through phishing, credential reuse or another compromise, an attacker may be able to access the AWS account.
+
+MFA adds a second authentication factor and reduces the likelihood that a stolen password alone can be used successfully.
+
+### Remediation
+
+MFA was configured for the IAM user using a virtual authenticator application.
+
+The following actions were performed:
+
+1. Reviewed the IAM Dashboard security recommendations.
+2. Generated and examined the IAM credential report.
+3. Confirmed that the IAM user had no active access key.
+4. Selected the IAM recommendation to add MFA.
+5. Registered a virtual authenticator application.
+6. Verified the MFA registration using authentication codes.
+7. Signed out and signed back in to test the new authentication control.
+8. Reviewed the IAM Dashboard to confirm that the user-MFA recommendation was removed.
+
+### Evidence Before Remediation
+
+The following screenshot shows the IAM Dashboard before MFA was enabled. The IAM username and account-specific information were removed.
+
+![IAM Dashboard before MFA](../screenshots/02-iam-dashboard-before-mfa.png)
+
+### Evidence After Remediation
+
+The following screenshot shows the updated IAM Dashboard after MFA was enabled.
+
+### Evidence Before Remediation
+
+The following screenshot shows the IAM Dashboard before MFA was enabled. The IAM username and account-specific information were removed.
+
+![IAM Dashboard before MFA](../screenshots/02-iam-dashboard-before-mfa.png)
+
+[View the before-MFA evidence](../screenshots/02-iam-dashboard-before-mfa.png)
+
+### Evidence After Remediation
+
+The following screenshot shows the updated IAM Dashboard after MFA was enabled.
+
+![IAM Dashboard after MFA](../screenshots/03-iam-dashboard-after-mfa.png)
+
+[View the after-MFA evidence](../screenshots/03-iam-dashboard-after-mfa.png)
+
+### Result
+
+MFA was successfully enabled for the IAM user. The account now requires both the IAM password and a temporary authentication code during sign-in.
+
+The root-user MFA recommendation remains a separate security finding and will require remediation using the root account.
+
+### Security Improvement
+
+| Before                            | After                                     |
+| --------------------------------- | ----------------------------------------- |
+| Password-only IAM authentication  | Password and MFA authentication           |
+| Two IAM security recommendations  | One IAM security recommendation remaining |
+| Higher risk from stolen passwords | Reduced account-takeover risk             |
+
+### Sensitive Information Handling
+
+The MFA QR code, authentication codes, AWS account number, IAM username, credential report and sign-in URL were not uploaded to this repository.
+
+### Status
+
+Completed
