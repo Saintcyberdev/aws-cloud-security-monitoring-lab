@@ -66,7 +66,7 @@ The zero-spend budget was created successfully. AWS will send an email notificat
 
 A sanitized screenshot of the active budget will be stored at:
 
-`screenshots/01-zero-spend-budget.png`
+![Zero-spend AWS budget alert](../screenshots/01-zero-spend-budget.png)
 
 Before uploading the screenshot, the following information must be hidden or cropped:
 
