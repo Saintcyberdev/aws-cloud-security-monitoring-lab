@@ -159,17 +159,17 @@ The following screenshot shows the updated IAM Dashboard after MFA was enabled.
 
 The following screenshot shows the IAM Dashboard before MFA was enabled. The IAM username and account-specific information were removed.
 
-![IAM Dashboard before MFA](../screenshots/02-iam-dashboard-before-mfa.png)
+![IAM Dashboard before MFA](../screenshots/02-iam-dashboard-before-mfa.png.jpeg)
 
-[View the before-MFA evidence](../screenshots/02-iam-dashboard-before-mfa.png)
+[View the before-MFA evidence](../screenshots/02-iam-dashboard-before-mfa.png.jpeg)
 
 ### Evidence After Remediation
 
 The following screenshot shows the updated IAM Dashboard after MFA was enabled.
 
-![IAM Dashboard after MFA](../screenshots/03-iam-dashboard-after-mfa.png)
+![IAM Dashboard after MFA](../screenshots/03-iam-dashboard-after-mfa.png.jpeg)
 
-[View the after-MFA evidence](../screenshots/03-iam-dashboard-after-mfa.png)
+[View the after-MFA evidence](../screenshots/03-iam-dashboard-after-mfa.png.jpeg)
 
 ### Result
 
