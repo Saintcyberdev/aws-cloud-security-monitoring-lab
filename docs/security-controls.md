@@ -145,15 +145,6 @@ The following actions were performed:
 7. Signed out and signed back in to test the new authentication control.
 8. Reviewed the IAM Dashboard to confirm that the user-MFA recommendation was removed.
 
-### Evidence Before Remediation
-
-The following screenshot shows the IAM Dashboard before MFA was enabled. The IAM username and account-specific information were removed.
-
-![IAM Dashboard before MFA](../screenshots/02-iam-dashboard-before-mfa.png)
-
-### Evidence After Remediation
-
-The following screenshot shows the updated IAM Dashboard after MFA was enabled.
 
 ### Evidence Before Remediation
 
