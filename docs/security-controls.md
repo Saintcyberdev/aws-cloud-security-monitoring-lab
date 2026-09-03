@@ -226,7 +226,7 @@ A development user could potentially perform destructive or unauthorized EC2 act
 
 The original permission summary showed broad EC2 access on development-tagged resources.
 
-![Development policy before remediation](../screenshots/05-dev-policy-summary.png.)
+![Development policy before remediation](../screenshots/05-dev-policy-summary.png)
 
 [View the original policy evidence](../screenshots/05-dev-policy-summary.png)
 
