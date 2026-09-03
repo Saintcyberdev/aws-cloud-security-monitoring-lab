@@ -372,3 +372,145 @@ The policy now follows least privilege and attribute-based access control princi
 ### Status
 
 Completed
+
+
+---
+
+## Control 4: CloudTrail Security Event Investigation
+
+### Objective
+
+Use AWS CloudTrail Event History to investigate a successful IAM configuration change and detect a controlled unauthorized-access attempt.
+
+### AWS Service
+
+AWS CloudTrail
+
+### Investigation Scope
+
+The investigation focused on two management activities:
+
+1. A successful update to `DevEnvironmentAccessPolicy`
+2. An unauthorized IAM request made by the separate development user
+
+CloudTrail Event History was used because it provides the account’s recent management events without requiring CloudTrail Lake.
+
+---
+
+### Investigation 1: IAM Policy Modification
+
+CloudTrail recorded the creation of a new version of the development policy.
+
+| Field            | Observed value                    |
+| ---------------- | --------------------------------- |
+| Identity type    | IAM user                          |
+| Event time       | September 3, 2026 at 11:53:56 UTC |
+| Event source     | `iam.amazonaws.com`               |
+| Event name       | `CreatePolicyVersion`             |
+| AWS Region       | `us-east-1`                       |
+| User agent       | Chrome on Windows 10              |
+| Read-only        | `false`                           |
+| Management event | `true`                            |
+| Error code       | None                              |
+| Policy version   | `v2`                              |
+| Default version  | `true`                            |
+
+The event was classified as a write operation because `readOnly` was set to `false`. No error code was present, indicating that the request succeeded.
+
+The response showed that policy version `v2` was created and set as the default version. This corresponds with the authorized least-privilege remediation performed during the IAM policy review.
+
+The source IP address, username, access-key information, account number, event ID, request ID and resource ARN were redacted from the public evidence.
+
+### Policy-Event Evidence
+
+![CloudTrail IAM event list](../screenshots/10-cloudtrail-iam-policy-event-list.png)
+
+[View the CloudTrail IAM event list](../screenshots/10-cloudtrail-iam-policy-event-list.png)
+
+![CreatePolicyVersion event details](../screenshots/11-create-policy-version-event-details.png)
+
+[View the CreatePolicyVersion event](../screenshots/11-create-policy-version-event-details.png)
+
+### Assessment
+
+The `CreatePolicyVersion` event was determined to be authorized because:
+
+* Its timestamp matched the approved policy-remediation activity.
+* The event was performed through the expected browser and operating system.
+* The affected policy matched the policy reviewed during the project.
+* Version `v2` contained the approved least-privilege configuration.
+* The new policy version was intentionally made the default.
+
+No incident-response escalation was required.
+
+---
+
+### Investigation 2: Controlled Unauthorized IAM Request
+
+A separate development user attempted to access an IAM function that was not permitted by the attached EC2-only policy.
+
+AWS denied the request and returned an Access Denied message.
+
+![Development user IAM access denied](../screenshots/12-dev-user-iam-access-denied.png)
+
+[View the development-user denial](../screenshots/12-dev-user-iam-access-denied.png)
+
+CloudTrail recorded the failed IAM API request with the following indicators:
+
+| Field         | Observed value      |
+| ------------- | ------------------- |
+| Identity type | IAM user            |
+| Event source  | `iam.amazonaws.com` |
+| Error code    | `AccessDenied`      |
+| Error message | Present             |
+| Result        | Request blocked     |
+
+![CloudTrail AccessDenied event](../screenshots/13-cloudtrail-access-denied-event.png)
+
+[View the CloudTrail AccessDenied event](../screenshots/13-cloudtrail-access-denied-event.png)
+
+### Security Analysis
+
+The denied event demonstrates that the development user’s effective permissions were limited to the approved EC2 operations. The user could not access unauthorized IAM functions.
+
+CloudTrail provided an audit record containing the identity, time, source, requested operation and failure information. In a production environment, repeated AccessDenied events could indicate:
+
+* Permission misconfiguration
+* An employee attempting an unauthorized action
+* Compromised credentials
+* Automated reconnaissance
+* Privilege-escalation attempts
+
+A single denied event matching this controlled test does not indicate an active security incident.
+
+### Response Procedure
+
+If an unexpected AccessDenied event were detected, the recommended response would be:
+
+1. Confirm the affected identity.
+2. Compare the event time with approved activity.
+3. Review the source IP address and user agent.
+4. Identify the requested AWS action and resource.
+5. Check for repeated denied or successful events.
+6. Review the user’s policies, groups and access keys.
+7. Disable or restrict credentials if compromise is suspected.
+8. Document the findings and remediation.
+
+### Result
+
+CloudTrail successfully recorded both an authorized IAM policy modification and a denied unauthorized request. The investigation demonstrated the ability to distinguish expected administrative activity from suspicious or prohibited behavior.
+
+### Skills Demonstrated
+
+* AWS CloudTrail Event History
+* Cloud audit-log analysis
+* IAM activity investigation
+* AccessDenied detection
+* Authorized-activity validation
+* Security-event classification
+* Incident-response reasoning
+* Sensitive-data sanitization
+
+### Status
+
+Completed
