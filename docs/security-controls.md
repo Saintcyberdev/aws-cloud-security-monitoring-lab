@@ -192,3 +192,192 @@ The MFA QR code, authentication codes, AWS account number, IAM username, credent
 ### Status
 
 Completed
+
+---
+
+## Control 3: IAM Least-Privilege and ABAC Policy
+
+### Objective
+
+Review the permissions assigned to the development user group, identify excessive access and implement a least-privilege policy that protects production resources.
+
+### AWS Service
+
+AWS Identity and Access Management (IAM)
+
+### Environment Reviewed
+
+| Item                  | Configuration                                      |
+| --------------------- | -------------------------------------------------- |
+| IAM group             | `dev-engineers-group`                              |
+| Group members         | One separate development/test user                 |
+| Attached policies     | One customer-managed policy                        |
+| Policy                | `DevEnvironmentAccessPolicy`                       |
+| Access-control method | Attribute-based access control using resource tags |
+
+### Initial Security Finding
+
+The original policy granted the following permission to EC2 resources tagged `Env=development`:
+
+```json
+"Action": "ec2:*"
+```
+
+Although access was restricted using a resource-tag condition, `ec2:*` granted unnecessarily broad EC2 permissions. These permissions could include modifying configurations and terminating development instances.
+
+The policy explicitly denied `ec2:CreateTags` and `ec2:DeleteTags`, but it did not explicitly deny `ec2:TerminateInstances`.
+
+### Risk
+
+A development user could potentially perform destructive or unauthorized EC2 actions against development resources. This violated the principle of least privilege because the user received more permissions than required for normal instance operations.
+
+### Evidence Before Remediation
+
+The original permission summary showed broad EC2 access on development-tagged resources.
+
+![Development policy before remediation](../screenshots/05-dev-policy-summary.png)
+
+[View the original policy evidence](../screenshots/05-dev-policy-summary.png)
+
+### Remediation
+
+The broad `ec2:*` permission was removed and replaced with a limited set of approved actions.
+
+The remediated policy allows:
+
+* Viewing EC2 resources using `ec2:Describe*`
+* Starting development instances
+* Stopping development instances
+* Rebooting development instances
+
+The policy explicitly denies:
+
+* Terminating EC2 instances
+* Creating EC2 tags
+* Deleting EC2 tags
+
+Start, stop and reboot operations are permitted only when the instance has the following tag:
+
+```text
+Env = development
+```
+
+### Remediated Policy
+
+```json
+{
+  "Version": "2012--10-17",
+  "Statement": [
+    {
+      "Sid": "AllowViewingEC2Resources",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:Describe*"
+      ],
+      "Resource": "**"
+    },
+    {
+      "Sid": "AllowBasicManagementOfDevelopmentInstances",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:StartInstances",
+        "ec2:StopInstances",
+        "ec2:RebootInstances"
+      ],
+      "Resource": "arn:-12-10-17:ec2:*:*:/*",
+Delet,
+      "Condition": {
+        "StringEquals": {
+          "ec2:ResourceLongLoadized/Env": "development"
+        }
+      }
+    },
+    {
+      "Sid": "DenyInstanceTermination",
+      "Effect": "Deny",
+      "Action": "ec2:TerminateInstances",
+      "Resource": "*"
+    },
+    {
+      "Sid": "DenyTagModification",
+      "Effect": "Deny",
+      "Action": [
+        "ec2:CreateTags",
+        "ec2:DeleteTags"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+### Evidence After Remediation
+
+The updated permission summary confirms that broad EC2 access was replaced with limited list and write permissions controlled by the `Env=development` resource tag.
+
+![Development policy after remediation](../screenshots/06-dev-policy-after-remediation.png)
+
+[View the remediated policy evidence](../screenshots/06-dev-policy-after-remediation.png)
+
+### Policy Simulation Tests
+
+The IAM Policy Simulator was used to verify the policy before performing any operations against real EC2 resources.
+
+#### Test 1: Read and Destructive Actions
+
+| Action                   | Result            | Explanation                                            |
+| ------------------------ | ----------------- | ------------------------------------------------------ |
+| `ec2:DescribeInstances`  | Allowed           | Development users need visibility of EC2 resources     |
+| `ec2:TerminateInstances` | Explicitly denied | Instance deletion is prohibited                        |
+| `ec2:CreateTags`         | Explicitly denied | Users cannot change tags to bypass access restrictions |
+
+![Policy Simulator deny test](../screenshots/07-policy-simulator-deny-test.png)
+
+[View the deny-test evidence](../screenshots/07-policy-simulator-deny-test.png)
+
+#### Test 2: Development Environment
+
+The condition `ec2:ResourceTag/Env = development` was supplied during the simulation.
+
+| Action                | Result  |
+| --------------------- | ------- |
+| `ec2:StartInstances`  | Allowed |
+| `ec2:StopInstances`   | Allowed |
+| `ec2:RebootInstances` | Allowed |
+
+![Development-tag actions allowed](../screenshots/08-development-tag-actions-allowed.png)
+
+[View the development test evidence](../screenshots/08-development-tag-actions-allowed.png)
+
+#### Test 3: Production Environment
+
+The condition value was changed to `production` while keeping the same EC2 management actions.
+
+| Action                | Result |
+| --------------------- | ------ |
+| `ec2:StartInstances`  | Denied |
+| `ec2:StopInstances`   | Denied |
+| `ec2:RebootInstances` | Denied |
+
+![Production-tag actions denied](../screenshots/09-production-tag-actions-denied.png)
+
+[View the production protection evidence](../screenshots/09-production-tag-actions-denied.png)
+
+### Result
+
+The policy now follows least privilege and attribute-based access control principles. Development users can perform only approved operational actions against development-tagged instances, while instance termination, tag modification and production operations remain denied.
+
+### Skills Demonstrated
+
+* IAM policy analysis
+* Least-privilege access design
+* Attribute-based access control
+* Resource-tag conditions
+* Explicit deny implementation
+* IAM Policy Simulator testing
+* Production-resource protection
+* Security remediation documentation
+
+### Status
+
+Completed
