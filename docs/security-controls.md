@@ -235,9 +235,9 @@ A development user could potentially perform destructive or unauthorized EC2 act
 
 The original permission summary showed broad EC2 access on development-tagged resources.
 
-![Development policy before remediation](../screenshots/05-dev-policy-summary.png)
+![Development policy before remediation](../screenshots/05-dev-policy-summary.png.png)
 
-[View the original policy evidence](../screenshots/05-dev-policy-summary.png)
+[View the original policy evidence](../screenshots/05-dev-policy-summary.png.png)
 
 ### Remediation
 
@@ -315,9 +315,9 @@ Delet,
 
 The updated permission summary confirms that broad EC2 access was replaced with limited list and write permissions controlled by the `Env=development` resource tag.
 
-![Development policy after remediation](../screenshots/06-dev-policy-after-remediation.png)
+![Development policy after remediation](../screenshots/06-dev-policy-after-remediation.png.png)
 
-[View the remediated policy evidence](../screenshots/06-dev-policy-after-remediation.png)
+[View the remediated policy evidence](../screenshots/06-dev-policy-after-remediation.png.png)
 
 ### Policy Simulation Tests
 
@@ -331,9 +331,9 @@ The IAM Policy Simulator was used to verify the policy before performing any ope
 | `ec2:TerminateInstances` | Explicitly denied | Instance deletion is prohibited                        |
 | `ec2:CreateTags`         | Explicitly denied | Users cannot change tags to bypass access restrictions |
 
-![Policy Simulator deny test](../screenshots/07-policy-simulator-deny-test.png)
+![Policy Simulator deny test](../screenshots/07-policy-simulator-deny-test.png.png)
 
-[View the deny-test evidence](../screenshots/07-policy-simulator-deny-test.png)
+[View the deny-test evidence](../screenshots/07-policy-simulator-deny-test.png.png)
 
 #### Test 2: Development Environment
 
@@ -345,9 +345,9 @@ The condition `ec2:ResourceTag/Env = development` was supplied during the simula
 | `ec2:StopInstances`   | Allowed |
 | `ec2:RebootInstances` | Allowed |
 
-![Development-tag actions allowed](../screenshots/08-development-tag-actions-allowed.png)
+![Development-tag actions allowed](../screenshots/08-development-tag-actions-allowed.png.png)
 
-[View the development test evidence](../screenshots/08-development-tag-actions-allowed.png)
+[View the development test evidence](../screenshots/08-development-tag-actions-allowed.png.png)
 
 #### Test 3: Production Environment
 
@@ -359,9 +359,9 @@ The condition value was changed to `production` while keeping the same EC2 manag
 | `ec2:StopInstances`   | Denied |
 | `ec2:RebootInstances` | Denied |
 
-![Production-tag actions denied](../screenshots/09-production-tag-actions-denied.png)
+![Production-tag actions denied](../screenshots/09-production-tag-actions-denied.png.png)
 
-[View the production protection evidence](../screenshots/09-production-tag-actions-denied.png)
+[View the production protection evidence](../screenshots/09-production-tag-actions-denied.png.png)
 
 ### Result
 
