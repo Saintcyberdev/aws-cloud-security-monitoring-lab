@@ -77,7 +77,7 @@ flowchart TD
 * [x] Test S3 object versioning
 * [x] Configure IAM Access Analyzer
 * [x] Review IAM Access Analyzer findings
-* [ ] Test GuardDuty threat detection
+* [x] Test GuardDuty threat detection
 * [ ] Produce an incident-response report
 * [ ] Complete the final security assessment
 
