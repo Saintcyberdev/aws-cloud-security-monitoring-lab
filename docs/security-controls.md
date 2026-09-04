@@ -658,3 +658,88 @@ The S3 bucket was created with encryption, versioning, ownership enforcement, pu
 ### Status
 
 Completed
+
+---
+
+## Control 6: IAM Access Analyzer External-Access Review
+
+### Objective
+
+Use IAM Access Analyzer to identify supported AWS resources that grant public or cross-account access outside the trusted AWS account.
+
+### AWS Service
+
+AWS Identity and Access Management Access Analyzer
+
+### Analyzer Configuration
+
+| Setting         | Configuration                |
+| --------------- | ---------------------------- |
+| Analysis type   | External access analysis     |
+| Zone of trust   | Current AWS account          |
+| AWS Region      | `us-east-1`                  |
+| Tag             | `Project = AWS-Security-Lab` |
+| Archive rules   | None                         |
+| Analyzer status | Active                       |
+
+### Security Purpose
+
+IAM Access Analyzer evaluates supported resource policies and generates findings when they grant access to an external principal.
+
+External principals may include:
+
+* Another AWS account
+* An AWS organization outside the trusted zone
+* A federated identity
+* A public or unrestricted principal
+* Another external entity supported by Access Analyzer
+
+This helps identify unintended public or cross-account access that may not be obvious during a manual policy review.
+
+### Analysis Result
+
+The analyzer completed its external-access scan and returned:
+
+```text
+Active findings: 0
+```
+
+No supported resource was detected as granting access outside the current AWS account.
+
+The secure S3 bucket did not generate a finding because:
+
+* Block Public Access was enabled.
+* ACLs were disabled.
+* Bucket owner enforcement was enabled.
+* The bucket policy did not grant public access.
+* The bucket policy only denied insecure transport.
+
+### Evidence
+
+![IAM Access Analyzer zero findings](../screenshots/20-access-analyzer-zero-findings.png)
+
+[View the Access Analyzer evidence](../screenshots/20-access-analyzer-zero-findings.png)
+
+### Interpretation
+
+Zero findings means that IAM Access Analyzer did not identify external access within its supported resource scope at the time of the scan.
+
+It does not guarantee that the entire AWS account is free from security risks. IAM permissions, network exposure, application vulnerabilities, credentials and unsupported resource types must still be assessed separately.
+
+### Result
+
+IAM Access Analyzer was successfully configured for external-access analysis. The scan returned zero active findings, supporting the conclusion that the lab’s supported resources were not publicly or externally accessible at the time of assessment.
+
+### Skills Demonstrated
+
+* IAM Access Analyzer configuration
+* External-access analysis
+* Zone-of-trust definition
+* Resource-policy assessment
+* Public and cross-account access review
+* Security-finding interpretation
+* Evidence sanitization
+
+### Status
+
+Completed
