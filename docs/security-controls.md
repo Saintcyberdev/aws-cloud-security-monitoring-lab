@@ -514,3 +514,147 @@ CloudTrail successfully recorded both an authorized IAM policy modification and 
 ### Status
 
 Completed
+
+
+---
+
+## Control 5: Secure Amazon S3 Configuration
+
+### Objective
+
+Create and assess an Amazon S3 bucket using security controls that protect stored objects from public exposure, insecure transmission, accidental modification and unauthorized ownership changes.
+
+### AWS Service
+
+Amazon Simple Storage Service (Amazon S3)
+
+### Security Configuration
+
+| Control              | Configuration                        |
+| -------------------- | ------------------------------------ |
+| AWS Region           | `us-east-1`                          |
+| Block Public Access  | All four settings enabled            |
+| Object Ownership     | Bucket owner enforced                |
+| Access control lists | Disabled                             |
+| Bucket Versioning    | Enabled                              |
+| Default encryption   | SSE-S3                               |
+| Secure transport     | HTTPS enforced through bucket policy |
+| Object Lock          | Disabled                             |
+| Project tag          | `Project = AWS-Security-Lab`         |
+
+### Bucket Versioning
+
+Bucket Versioning was enabled to preserve multiple versions of an object. This control supports recovery from accidental overwrites, unwanted changes and certain destructive actions.
+
+![S3 bucket versioning enabled](../screenshots/14-s3-versioning-enabled.png)
+
+[View the versioning evidence](../screenshots/14-s3-versioning-enabled.png)
+
+### Default Encryption
+
+Default server-side encryption was configured using Amazon S3 managed keys (`SSE-S3`). New objects placed in the bucket are automatically encrypted at rest.
+
+SSE-S3 was selected instead of SSE-KMS to avoid unnecessary AWS KMS usage and cost within this small lab.
+
+![S3 default encryption](../screenshots/15-s3-default-encryption.png)
+
+[View the encryption evidence](../screenshots/15-s3-default-encryption.png)
+
+### Public-Access Protection
+
+Block Public Access was enabled at the bucket level. All four individual controls were enabled to prevent access through public ACLs, bucket policies and access-point policies.
+
+![S3 Block Public Access](../screenshots/16-s3-block-public-access.png)
+
+[View the public-access evidence](../screenshots/16-s3-block-public-access.png)
+
+### Object Ownership
+
+Object Ownership was configured as `Bucket owner enforced`. ACLs were disabled, and access to the bucket and its objects is controlled through policies.
+
+This configuration reduces permission complexity and prevents object ownership from depending on the account that uploads an object.
+
+![S3 Object Ownership](../screenshots/17-s3-object-ownership.png)
+
+[View the object-ownership evidence](../screenshots/17-s3-object-ownership.png)
+
+### Secure-Transport Policy
+
+A bucket policy was added to deny all S3 actions when the connection does not use secure transport.
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyInsecureTransport",
+      "Effect": "Deny",
+      "Principal": "*",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::LAB-BUCKET-NAME",
+        "arn:aws:s3:::LAB-BUCKET-NAME/*"
+      ],
+      "Condition": {
+        "Bool": {
+          "aws:SecureTransport": "false"
+        }
+      }
+    }
+  ]
+}
+```
+
+`LAB-BUCKET-NAME` is used in the public documentation instead of an account-specific resource value.
+
+The policy does not grant public access. It explicitly denies requests sent over insecure HTTP connections.
+
+![S3 secure-transport policy](../screenshots/18-s3-deny-insecure-transport-policy.png)
+
+[View the secure-transport policy evidence](../screenshots/18-s3-deny-insecure-transport-policy.png)
+
+### Versioning Test
+
+A harmless text object named `security-test.txt` was uploaded twice using the same object name but different content.
+
+| Upload        | Content marker |
+| ------------- | -------------- |
+| First upload  | Version 1      |
+| Second upload | Version 2      |
+
+After enabling **Show versions**, Amazon S3 displayed two different object versions with separate version IDs and timestamps. This confirmed that versioning was functioning correctly.
+
+![S3 object version history](../screenshots/19-s3-object-version-history.png)
+
+[View the version-history evidence](../screenshots/19-s3-object-version-history.png)
+
+### Security Value
+
+The implemented controls provide several layers of protection:
+
+* Encryption protects objects at rest.
+* HTTPS enforcement protects data in transit.
+* Block Public Access reduces accidental exposure.
+* Bucket owner enforcement simplifies ownership and authorization.
+* Disabled ACLs reduce conflicting access controls.
+* Versioning supports recovery from accidental overwrites.
+* Project tagging supports identification and cost organization.
+
+### Result
+
+The S3 bucket was created with encryption, versioning, ownership enforcement, public-access blocking and a secure-transport policy. Testing confirmed that multiple versions of the same object were retained successfully.
+
+### Skills Demonstrated
+
+* Amazon S3 security
+* Encryption at rest
+* Secure transport enforcement
+* Bucket-policy configuration
+* Public-access prevention
+* Object ownership management
+* Versioning and recovery
+* Cloud-storage risk reduction
+
+### Status
+
+Completed
